@@ -1,0 +1,37 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+ul{
+    list-style: none;
+}
+.maxW-box{
+    width: 1200px;
+    margin: 0 auto;
+}
+.condition{
+    display: flex;
+    flex-wrap: wrap;
+}
+.condition>div{
+    margin-right: 5px;
+    margin-bottom: 6px;
+    height: 25px;
+    line-height: 25px;
+    cursor: pointer;
+    padding: 0 9px;
+    color: #666;
+}
+body .el-radio__input.is-checked .el-radio__inner{
+    border-color: #FE6603;
+    background: #FE6603;
+}
+body .el-radio__input.is-checked+.el-radio__label{
+    color: #FE6603
+}
+body .el-loading-spinner .el-loading-text{
+        color:#FE6603;
+} 
+body .el-loading-spinner .path{
+    stroke:#FE6603
+}
