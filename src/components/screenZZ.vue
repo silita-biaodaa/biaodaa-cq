@@ -245,6 +245,7 @@ export default {
             this.$set(this.lengthList,i,this.lengthList[i])
             if(this.forinFn()){
                 o.two.code='';
+                o.three.list=[];
                 this.$confirm('资质条件重复，请重新选择', '提示', {
                     type: 'warning',
                     showCancelButton: false,
@@ -275,7 +276,10 @@ export default {
             if(this.lengthList.length>1){
                 let arr=[],arr1=[];
                 for(let x of this.lengthList){
-                    arr.push(x.str)
+                    if(x.str==''){
+                        return false
+                    }
+                    arr.push(x.two.code)
                 }
                 arr1=new Set(arr);
                 if(arr.length!=arr1.size){

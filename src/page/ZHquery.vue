@@ -30,8 +30,8 @@
                         <el-input placeholder="请输入内容,多个关键字用空格隔开"  v-model="data.project.keywords"></el-input>
                         <el-radio-group v-model="data.project.opt">
                             <el-radio label="title">根据标题搜索</el-radio>
-                            <el-radio label="scope">根据规模搜索</el-radio>
-                            <el-radio label="title_and_scope">根据标题和规模搜索</el-radio>
+                            <el-radio label="scope">根据建设规模搜索</el-radio>
+                            <el-radio label="title_and_scope">根据标题和建设规模搜索</el-radio>
                         </el-radio-group>
                     </el-row>
                     <!-- 业绩所含子项 -->
@@ -72,16 +72,16 @@
                     <!-- 中标日期/合同签订日期 -->
                     <el-row>
                         <el-col :span="5">中标日期/合同签订日期：</el-col>
-                        <el-date-picker v-model="data.project.contractStart" type="date" placeholder="起始日期" class="inputW"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="data.project.contractStart" type="date" placeholder="起始日期" class="inputW"></el-date-picker>
                         ——
-                        <el-date-picker v-model="data.project.contractEnd" type="date" placeholder="结束日期" class="inputW r"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="data.project.contractEnd" type="date" placeholder="结束日期" class="inputW r"></el-date-picker>
                     </el-row>
                     <!-- 竣工验收日期 -->
                     <el-row>
                         <el-col :span="5">竣工验收日期：</el-col>
-                        <el-date-picker v-model="data.project.completeStart" type="date" placeholder="起始日期" class="inputW"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="data.project.completeStart" type="date" placeholder="起始日期" class="inputW"></el-date-picker>
                         ——
-                        <el-date-picker v-model="data.project.completeEnd" type="date" placeholder="结束日期" class="inputW r"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="data.project.completeEnd" type="date" placeholder="结束日期" class="inputW r"></el-date-picker>
                     </el-row>
                     <!-- 面积 -->
                     <el-row>
@@ -91,7 +91,7 @@
                         <el-input placeholder="最大面积（㎡）" v-model="data.project.areaEnd" class="inputW r" @keyup.native="data.project.areaEnd=data.project.areaEnd.replace(/\D/g,'')"></el-input>
                     </el-row>
                     <!-- 符合业绩条件的数量 -->
-                    <el-row>
+                    <el-row v-if="isyj">
                         <el-col :span="5">符合业绩条件的数量：</el-col>
                         <el-input-number v-model="data.project.proCount" :min="1" size="mini"></el-input-number>
                     </el-row>
@@ -100,7 +100,17 @@
         </div>
         <!-- 承上启下 -->
         <div class="totalBox  maxW-box">
-            <p>共为您找到符合企业<span>{{total?total:0}}</span>条</p>
+            <p>
+                共为您找到符合企业
+                <span>
+                    <template v-if="total">
+                        <template v-if="total==5000">5000+</template>
+                        <template v-else>{{total}}</template>
+                    </template>
+                    <template v-else>0</template>
+                </span>
+                家
+            </p>
         </div>
         <!-- 列表 -->
         <div class="list  maxW-box">
@@ -109,16 +119,25 @@
                 <!-- 有数据 -->
                 <template v-if="list&&list.length>0">
                     <ul>
-                        <li v-for="(o,i) of list" :key="'list'+i">
+                        <li v-for="(o,i) of list" :key="'list'+i" @click="jumpDetail(o.comId)">
                             <div class="top">
-                                <h5 class="title">{{o.comName}}</h5>
-                                <span class="label" :class="o.joinRegion=='入渝'?'ry':'yn'" v-if="o.joinRegion">{{o.joinRegion}}</span>
+                                <h5>{{o.comName}}</h5>
+                                <div class="right-label"  v-if="o.joinRegion.length>0">
+                                    <span class="label r-delta" v-for="(x,y) of o.joinRegion" :key="y">{{x}}</span>
+                                    <!-- <template v-if="o.joinRegion.length>7">
+                                        <span class="label">更多</span>.slice(0,5)
+                                    </template>
+                                    <template v-else>
+                                        <span class="label">{{o.joinRegion[6]}}</span>
+                                    </template> -->
+                                </div>
+                                <!-- <span class="label">入渝</span> -->
                             </div>
                             <div class="bottom">
                                 <p>注册地：<font>{{o.regisAddress}}</font></p>
-                                <p>符合要求资质：<font>{{o.qualCount}}</font></p>
+                                <p v-if="data.qualCode!=null">符合要求资质：<font>{{o.qualCount}}</font></p>
                                 <!-- <font>符合要求人员：<font>1</font></p> -->
-                                <p>符合要求业绩：<font>{{o.projectCount}}</font></p>
+                                <p v-if="isyj">符合要求业绩：<font>{{o.projectCount}}</font></p>
                             </div>
                         </li>
                     </ul>
@@ -338,15 +357,15 @@ export default {
                     completeEnd:null,//竣工结束日期
                     areaStart:null,//最小面积
                     areaEnd:null,//最大面积
-                    proCount:1,//符合业绩条件的数量
+                    proCount:0,//符合业绩条件的数量
                 },
                 person:[]
-                
             },
             list:[],
             total:0,
             loading:true,
-            isajax:false
+            isajax:false,
+            isyj:false,
         }
     },
     watch: {
@@ -358,6 +377,13 @@ export default {
             deep:true,
             handler(newVal,oldVal){
                 this.ajax()
+            }
+        },
+        'data.project':{
+            deep:true,
+            handler(newval,oldVal){
+                this.isyj=true;
+                this.data.project.proCount=1;
             }
         }
     },
@@ -373,6 +399,16 @@ export default {
     created() {
         // console.group('创建完毕状态===============》created');
         let data = JSON.parse(sessionStorage.getItem('filter'));
+        for(let x in data.comQua){//剔除公路养护及地质灾害防治单位条件
+            if(data.comQua[x].name=='公路养护'){
+                data.comQua.splice(x,1);
+            }
+        }
+        for(let x in data.comQua){//剔除公路养护及地质灾害防治单位条件
+            if(data.comQua[x].name=='地质灾害防治单位'){
+                data.comQua.splice(x,1);
+            }
+        }
         this.companyQuals = data.comQua;
         for(let x of data.area){
             x.istap=false
@@ -384,6 +420,7 @@ export default {
         })
         let ryData=JSON.parse(sessionStorage.getItem('people'));
         this.peopleList=ryData
+        // this.data=this.$store.state.queryData;
         this.ajax()
     },
     beforeMount() {
@@ -408,18 +445,22 @@ export default {
         // 方法 集合
         addressFn(el){
             this.data.regisAddress=el.code;
+            this.data.pageNo=1;
             // this.ajax()
         },
         isBeiFn(el){//备案地区
             this.data.joinRegion=el.code;
+            this.data.pageNo=1;
             // this.ajax()
         },
         screenzzFn(val){//接受资质变化抛出的值
             this.data.qualCode=val.str;
+            this.data.pageNo=1;
             // this.ajax()
         },
         screenryFn(val){//接受人员变化抛出的值
             this.data.person=val;
+            this.data.pageNo=1;
             // this.ajax()
         },
         forArrStr(arr){//从数组中取出对应值
@@ -472,21 +513,25 @@ export default {
         itemFn(el){//业绩所含子项
             el.istap=!el.istap;
             this.data.project.childProject=this.forArrStr(this.itemList);
+            this.data.pageNo=1;
             // this.ajax()
         },
         areaTap(el){//项目属地
             this.selectFn(el,this.areasList)
             this.data.project.proWhere=this.forArrStr(this.areasList);
+            this.data.pageNo=1;
             // this.ajax()
         },
         typeTap(el){//业绩类型
             this.selectFn(el,this.typeList)
             this.data.project.proType=this.forArrStr(this.typeList);
+            this.data.pageNo=1;
             // this.ajax()
         },
         purposeTap(el){//工程用途
             this.selectFn(el,this.purposeList)
             this.data.project.proUse=this.forArrStr(this.purposeList);
+            this.data.pageNo=1;
             // this.ajax()
         },
         Goto(val){
@@ -495,6 +540,7 @@ export default {
         },
         ajax(){//查询
             this.list=[];
+            this.total=0;
             this.isajax=false;
             let data=this.data
             data.project.keywords=data.project.keywords.replace(/ /g,',');
@@ -519,6 +565,23 @@ export default {
         //刷新
         recoldFn() {
             this.reload();
+        },
+        //跳转
+        jumpDetail(id){
+            this.$http({
+                method:'post',
+                url:'/query/zonghe/save/condition',
+                data:this.data
+            }).then(res =>{
+                const {href} = this.$router.resolve({
+                    path: '/skyDetail',
+                    query: {
+                        id:id,
+                        key:res.data.data
+                    }
+                })
+                window.open(href, '_blank', )
+            })
         }
     }
 
@@ -588,34 +651,53 @@ export default {
     //     border: none;
     // }
     .top{
-        position: relative;
+        cursor: pointer;
+        display: flex;
+        // justify-content: space-between;
         h5{
             font-size: 20px;
+            margin-right: 12px;
         }
         .label{
-            position: absolute;
             display: inline-block;
-            padding: 5px 7px 5px 22px;
-            color: #fff;
-            right: 0;
-            top: 0;
-            text-align: center
+            padding: 2px 5px;
+            text-align: center;
+            margin-right: 12px;
+            background: #E3E6FD;
+            color: #3A76F0;
         }
-        .label:after{
-            content: '';
-            position: absolute;
-            border-top: 15px solid transparent;
-            border-bottom: 15px solid transparent;
-            border-left: 15px solid #fff;
-            top: 0;
-            left: 0;
-        }
-        .ry{
-            background: #f49c17;
-        }
-        .yn{
-            background: #f1ce32;
-        }
+        // .label{
+        //     position: relative;
+        //     display: inline-block;
+        //     padding: 5px 7px 5px 22px;
+        //     color: #fff;
+        //     text-align: center;
+        //     margin-right: 11px
+        // }
+        // .label:after{
+        //     content: '';
+        //     position: absolute;
+        //     border-top: 15px solid transparent;
+        //     border-bottom: 15px solid transparent;
+        //     border-left: 15px solid #fff;
+        //     top: 0;
+        //     left: 0;
+        // }
+        // .r-delta::before{
+        //     content: '';
+        //     position: absolute;
+        //     border-top: 15px solid transparent;
+        //     border-bottom: 15px solid transparent;
+        //     border-left: 15px solid #f1ce32;
+        //     top: 0;
+        //     right: -15px;
+        // }
+        // .ry{
+        //     background: #f49c17;
+        // }
+        // .yn{
+        //     background: #f1ce32;
+        // }
     }
     .bottom{
         display: flex;

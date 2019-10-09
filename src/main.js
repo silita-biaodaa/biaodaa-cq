@@ -8,6 +8,7 @@ import cnJson from './china'
 import ElementUI from 'element-ui';
 import http from '@/base/http'
 import 'element-ui/lib/theme-chalk/index.css';
+// import store from './store';
 Vue.use(ElementUI);
 // import cnJson from './cnJson'
 echarts.registerMap('china',cnJson)
@@ -18,26 +19,34 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  // store,
   components: { App },
   template: '<App/>',
   created() {
     //资质，地区筛选
-    this.$http({
-        method:'post',
-        url:'/new/common/condition',
-        data:{}
-    }).then(res => {
-        sessionStorage.setItem('filter',JSON.stringify(res.data.data));
-    }).catch(req =>{
-        console.log(req);
-    })
-    //人员筛选
-    this.$http({
-        method:'post',
-        url:'/person/cate',
-        data:{}
-    }).then(res =>{
-      sessionStorage.setItem('people',JSON.stringify(res.data.data));
-    })
+    if(!sessionStorage.getItem('filter')){
+      this.$http({
+          method:'post',
+          url:'/new/common/condition',
+          data:{}
+      }).then(res => {
+          sessionStorage.setItem('filter',JSON.stringify(res.data.data));
+          history.go(0)
+      }).catch(req =>{
+          console.log(req);
+      })
+    }
+    if(!sessionStorage.getItem('people')){
+      //人员筛选
+      this.$http({
+          method:'post',
+          url:'/person/cate',
+          data:{}
+      }).then(res =>{
+        sessionStorage.setItem('people',JSON.stringify(res.data.data));
+        history.go(0)
+      })
+    }
+    
   },
 })

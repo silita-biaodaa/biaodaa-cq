@@ -16,7 +16,7 @@
                     <el-option v-for="item in el.three.list" :key="item.cateName" :label="item.cateName" :value="item.cateName"></el-option>
                 </el-select>
                 人员数量：
-                <el-input-number v-model="el.num" :min="1" size="mini"></el-input-number>
+                <el-input-number v-model="el.num" :min="1" size="mini" @change="returnStr"></el-input-number>
                 <span class='del-btn' v-if="i!=0" @click="delFn(i)">删除</span>
             </template>
             <!-- 一人多证 -->
@@ -40,7 +40,7 @@
                     </div>
                     <div class="people-num">
                         人员数量：
-                        <el-input-number v-model="el.num" :min="1" size="mini"></el-input-number>
+                        <el-input-number v-model="el.num" :min="1" size="mini" @change="returnStr"></el-input-number>
                     </div>
                     <div class="close" @click="delFn(i)">
                         <i class="el-icon-error"></i>
@@ -164,6 +164,7 @@ export default {
                 return
             }
             this.lengthList.splice(i,1);
+            this.returnStr();
         },
         addtoFn(){//添加一人多证
             let data={
@@ -218,13 +219,13 @@ export default {
         },
         forinFn(){//匹配是否重复
             if(this.lengthList.length>1){
-                let arr=[],arr1;
                 for(let x of this.lengthList){
-                    if(x.type==0){//一人一证
-                        arr.push(x.two.cateName)
-                    }else{//一人多证
+                    if(x.type==1){//一人多证
                         let many=[],many1;
                         for(let o of x.list){
+                            if(o.str==''){
+                                return false
+                            }
                             many.push(o.two.cateName)
                         }
                         many1=new Set(many);
@@ -232,10 +233,6 @@ export default {
                             return true
                         }
                     }
-                }
-                arr1=new Set(arr);
-                if(arr.length!=arr1.size){
-                    return true
                 }
             }
         },
@@ -247,7 +244,13 @@ export default {
             o.str=''
             for(let x of o.one.list){
                 if(x.cateName==o.one.cateName){
-                    o.two.list=x.list
+                    if(x.list){
+                        o.two.list=x.list
+                    }else{
+                        o.str=o.one.cateName
+                        this.returnStr();
+                        break
+                    }
                 }
             }
         },
@@ -262,7 +265,7 @@ export default {
             }
             if(this.forinFn()){
                 o.two.cateName='';
-                this.$confirm('资质条件重复，请重新选择', '提示', {
+                this.$confirm('条件重复，请重新选择', '提示', {
                     type: 'warning',
                     showCancelButton: false,
                     showConfirmButton: false
@@ -287,7 +290,7 @@ export default {
             o.str=arr.join('/');
             if(this.forinFn()){
                 o.three.cateName='';
-                this.$confirm('资质条件重复，请重新选择', '提示', {
+                this.$confirm('条件重复，请重新选择', '提示', {
                     type: 'warning',
                     showCancelButton: false,
                     showConfirmButton: false
