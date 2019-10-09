@@ -45,32 +45,81 @@
                 </template>
             </div>
             <div class="list-box">
-                <div class="condition">
-                    <span v-for="(o,i) of conditionList" :key="i" :class="conditionName==o.name?'current':''" @click="conditionFn(o,i)">{{o.name}}({{o.num}})</span>
-                </div>
-                <table ref="table">
-                    <thead>
-                        <td>序号</td>
-                        <td>资质类别</td>
-                        <td>资质名称</td>
-                        <td>发证机关</td>
-                        <td>证书有效期</td>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(o,i) of list" :key="i">
-                            <td>{{i+1}}</td>
-                            <td>{{o.qualType}}</td>
-                            <td>{{o.qualName}}</td>
-                            <td>{{o.certOrg}}</td>
-                            <td>{{o.validDate}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <template v-if="tabNum==0">
+                    <!-- 资质 -->
+                    <div class="condition">
+                        <span v-for="(o,i) of conditionList" :key="i" :class="conditionName==o.name?'current':''" @click="conditionFn(o,i)">{{o.name}}({{o.num}})</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <td>序号</td>
+                            <td>资质类别</td>
+                            <td>资质名称</td>
+                            <td>发证机关</td>
+                            <td>证书有效期</td>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(o,i) of list" :key="i">
+                                <td>{{i+1}}</td>
+                                <td>{{o.qualType}}</td>
+                                <td>{{o.qualName}}</td>
+                                <td>{{o.certOrg}}</td>
+                                <td>{{o.validDate}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </template>
+                <template v-else-if="tabNum==1">
+                    <!-- 人员 -->
+                    <div class="condition">
+                        <span v-for="(o,i) of conditionList" :key="i" :class="conditionName==o.name?'current':''" @click="conditionFn(o,i)">{{o.name}}({{o.num}})</span>
+                    </div>
+                    <table ref="people">
+                        <thead>
+                            <td>序号</td>
+                            <td>资质类别</td>
+                            <td>资质名称</td>
+                            <td>发证机关</td>
+                            <td>证书有效期</td>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(o,i) of list" :key="i">
+                                <td>{{i+1}}</td>
+                                <td>{{o.qualType}}</td>
+                                <td>{{o.qualName}}</td>
+                                <td>{{o.certOrg}}</td>
+                                <td>{{o.validDate}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </template>
+                <template v-else>
+                    <!-- 业绩 -->
+                    <table ref="yj">
+                        <thead>
+                            <td>序号</td>
+                            <td>资质类别</td>
+                            <td>资质名称</td>
+                            <td>发证机关</td>
+                            <td>证书有效期</td>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(o,i) of yjList" :key="i">
+                                <td>{{i+1}}</td>
+                                <td>{{o.qualType}}</td>
+                                <td>{{o.qualName}}</td>
+                                <td>{{o.certOrg}}</td>
+                                <td>{{o.validDate}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </template>
             </div>
         </div>
     </div>
 </template>
 <script>
+import paging from '@/components/paging'
 export default {
     name: 'skyDetail', // 结构名称
     data() {
@@ -98,6 +147,16 @@ export default {
             list:[],//显现数组
             qualList:[],//资质承载数组
             allList:[],
+            yjData:{
+                type:'project',
+                comId:'',
+                pageNo:1,
+                pageSize:20
+            },
+            yjTotal:0,
+            yjList:[],
+            data:{}
+
         }
     },
     watch: {
@@ -119,6 +178,7 @@ export default {
         }).then(res =>{
             //基本信息
             let data=res.data.data
+            this.data=data;
             data.comId=this.$route.query.id;
             data.type='detail'
             this.$http({
@@ -239,8 +299,23 @@ export default {
             if(i==1){
 
             }else if(i==2){
+                this.yjData=JSON.parse(JSON.stringify(this.data));
+                this.yjData.comId=this.$route.query.id;
+                this.yjData.pageNo=1;
+                this.yjData.pageSize=20;
+                this.yjData.type='project'
                 this.yjAjax();
             }
+        },
+        yjAjax(){
+
+            this.$http({
+                method:'post',
+                url:"/query/zonghe/detail/company",
+                data:this.yjData
+            }).then(res => {
+                this.yjList=res.data.data;
+            })
         }
     }
 
