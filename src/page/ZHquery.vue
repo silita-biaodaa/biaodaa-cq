@@ -382,8 +382,16 @@ export default {
         'data.project':{
             deep:true,
             handler(newval,oldVal){
-                this.isyj=true;
-                this.data.project.proCount=1;
+                if(newval.keywords!=''||newval.opt!='title'||newval.childProject
+                    ||newval.proWhere||newval.proUse||newval.proType||newval.amountStart
+                    ||newval.amountEnd||newval.contractStart||newval.contractEnd||newval.completeStart
+                    ||newval.completeEnd||newval.areaStart||newval.areaEnd){//如果筛选了业绩，则显示符合业绩数量
+                        this.isyj=true;
+                }else{
+                    this.isyj=false;
+                }
+                
+                // this.data.project.proCount=1;
             }
         }
     },
@@ -469,6 +477,7 @@ export default {
             for(let x of arr){
                 if(x.istap){
                     if(x.name=='不限'){
+                        str=null
                         return str
                     }
                     a.push(x.name)
@@ -568,21 +577,35 @@ export default {
         },
         //跳转
         jumpDetail(id){
-            this.$http({
-                method:'post',
-                url:'/query/zonghe/save/condition',
-                data:this.data
-            }).then(res =>{
+            let d=this.data;
+            if(d.project.keywords!=''||d.project.opt!='title'||d.project.childProject
+                ||d.project.proWhere||d.project.proUse||d.project.proType||d.project.amountStart
+                ||d.project.amountEnd||d.project.contractStart||d.project.contractEnd||d.project.completeStart
+                ||d.project.completeEnd||d.project.areaStart||d.project.areaEnd||d.person.length>0||d.qualCode){//查询了资质或人员或业绩
+                this.$http({
+                    method:'post',
+                    url:'/query/zonghe/save/condition',
+                    data:this.data
+                }).then(res =>{
+                    const {href} = this.$router.resolve({
+                        path: '/skyDetail',
+                        query: {
+                            id:id,
+                            key:res.data.data
+                        }
+                    })
+                    window.open(href, '_blank', )
+                })
+            }else{
                 const {href} = this.$router.resolve({
-                    path: '/skyDetail',
+                    path: '/companyDetail',
                     query: {
                         id:id,
-                        key:res.data.data
                     }
                 })
                 window.open(href, '_blank', )
-            })
-        }
+            }
+        },
     }
 
 }

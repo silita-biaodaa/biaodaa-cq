@@ -99,7 +99,7 @@
 				});
 			},
 			jump() { //跳转
-				if (this.num != '' && this.num <= 30 && this.num >= 1 && this.num <= this.total) {
+				if (this.num != ''  && this.num >= 1 && this.num <= this.total) {
 					this.current = (this.num) * 1;
 					this.$emit('skip', {
 						cur: this.current
@@ -242,6 +242,7 @@
 				border: 1px solid @color;
 				height: 40px;
 				line-height: 40px;
+				outline: none;
 				width: 40px;
 				border-radius: 5px;
 				padding-left: 10px;

@@ -39,11 +39,13 @@
             <div class="tab">
                 <template>
                     <ul>
+                        <span @click="jump">查看数据源</span>
                         <li v-for="(o,i) of tabList" :key="i" :class="tabNum==i?'current':''" @click="tabFn(i)">{{o.name}}</li>
                     </ul>
                 </template>
             </div>
             <div class="list-box">
+                <!-- 资质 -->
                 <template v-if="tabNum==0">
                     <div class="condition">
                         <span v-for="(o,i) of conditionList" :key="i" :class="conditionName==o.name?'current':''" @click="conditionFn(o,i)">{{o.name}}({{o.num}})</span>
@@ -67,49 +69,95 @@
                         </tbody>
                     </table>
                 </template>
+                <!-- 人员 -->
                 <template v-else-if="tabNum==1">
-                    <table ref="people">
-                        <thead>
-                            <td>序号</td>
-                            <td>姓名</td>
-                            <td>身份证号</td>
-                            <td>证书编号</td>
-                            <td>注册类别</td>
-                            <td>注册专业</td>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(o,i) of peopleList" :key="i">
-                                <td>{{(peopleData.pageNo-1)*20+i+1}}</td>
-                                <td>{{o.name}}</td>
-                                <td>{{o.idCard}}</td>
-                                <td>{{o.certNo}}</td>
-                                <td>{{o.major}}</td>
-                                <td>{{o.category}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <v-page :all='peopleTotal' :currents='peopleData.pageNo' :pageSize='peopleData.pageSize' @skip='peopleGoto'></v-page>
+                    <!-- 加载中 -->
+                    <template v-if="peopleIsajax">
+                        <template v-if="peopleList&&peopleList.length>0">
+                            <table ref="people">
+                                <thead>
+                                    <td>序号</td>
+                                    <td>姓名</td>
+                                    <td>身份证号</td>
+                                    <td>证书编号</td>
+                                    <td>注册类别</td>
+                                    <td>注册专业</td>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(o,i) of peopleList" :key="i">
+                                        <td>{{(peopleData.pageNo-1)*20+i+1}}</td>
+                                        <td>{{o.name}}</td>
+                                        <td>{{o.idCard}}</td>
+                                        <td>{{o.certNo}}</td>
+                                        <td>{{o.major}}</td>
+                                        <td>{{o.category}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <v-page :all='peopleTotal' :currents='peopleData.pageNo' :pageSize='peopleData.pageSize' @skip='peopleGoto'></v-page>
+                        </template>
+                        <!-- 无数据  -->
+                        <template v-else-if="peopleList&&peopleList.length==0">
+                            <div class="no-toast">
+                                <img src="../assets/bank_card @2x.png" alt="">
+                                <span>Sorry，没有找到符合条件的项目信息</span>
+                            </div>
+                        </template>
+                        <!-- 加载失败 -->
+                        <template v-else-if="!peopleList">
+                            <div class="ajax-erroe">
+                                <img src="../assets/pic-zoudiu.png" />
+                                <span @click="recoldFn">刷新</span>
+                            </div>
+                        </template>
+                    </template>
+                    <template v-else>
+                        <div style="min-height:240px" v-loading="loading" element-loading-text="拼命加载中"></div>
+                    </template>
                 </template>
+                <!-- 业绩 -->
                 <template v-else>
-                    <table ref="yj">
-                        <thead>
-                            <td style="width:32px">序号</td>
-                            <td style="width:calc(100% - 300px)">项目名称</td>
-                            <td style="width:92px">业绩类型</td>
-                            <td style="width:90px">中标金额/合同金额（万元）</td>
-                            <td style="width:82px">竣工时间</td>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(o,i) of yjList" :key="i">
-                                <td>{{(yjData.pageNo-1)*20+i+1}}</td>
-                                <td>{{o.proName}}</td>
-                                <td>{{o.proType}}</td>
-                                <td>{{o.amount}}</td>
-                                <td>{{o.buildEnd}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <v-page :all='yjTotal' :currents='yjData.pageNo' :pageSize='yjData.pageSize' @skip='yjGoto'></v-page>
+                    <!-- 加载中 -->
+                    <template v-if="yjIsajax">
+                        <template v-if="yjList&&yjList.length>0">
+                            <table ref="yj">
+                                <thead>
+                                    <td style="width:32px">序号</td>
+                                    <td style="width:calc(100% - 300px)">项目名称</td>
+                                    <td style="width:92px">业绩类型</td>
+                                    <td style="width:90px">中标金额/合同金额（万元）</td>
+                                    <td style="width:82px">竣工时间</td>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(o,i) of yjList" :key="i">
+                                        <td>{{(yjData.pageNo-1)*20+i+1}}</td>
+                                        <td>{{o.proName}}</td>
+                                        <td>{{o.proType}}</td>
+                                        <td>{{o.amount}}</td>
+                                        <td>{{o.buildEnd}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <v-page :all='yjTotal' :currents='yjData.pageNo' :pageSize='yjData.pageSize' @skip='yjGoto'></v-page>
+                        </template>
+                        <!-- 无数据  -->
+                        <template v-else-if="yjList&&yjList.length==0">
+                            <div class="no-toast">
+                                <img src="../assets/bank_card @2x.png" alt="">
+                                <span>Sorry，没有找到符合条件的项目信息</span>
+                            </div>
+                        </template>
+                        <!-- 加载失败 -->
+                        <template v-else-if="!yjList">
+                            <div class="ajax-erroe">
+                                <img src="../assets/pic-zoudiu.png" />
+                                <span @click="recoldFn">刷新</span>
+                            </div>
+                        </template>
+                    </template>
+                    <template v-else>
+                        <div style="min-height:240px" v-loading="loading" element-loading-text="拼命加载中"></div>
+                    </template>
                 </template>
             </div>
         </div>
@@ -122,6 +170,7 @@ export default {
     data() {
         return {
             // 数据模型a
+            loading:true,
             tabList:[
                 {
                     name:'企业资质',
@@ -148,7 +197,9 @@ export default {
                 province: '',
                 pageNo:1,
                 pageSize:20,
-                comId:''
+                comId:'',
+                keyWord:"",
+                category:""
             },
             peopleList:[],//人员数组
             peopleTotal:0,
@@ -161,7 +212,9 @@ export default {
                 pageSize: 20,
             },
             yjList:[],
-            yjTotal:0
+            yjTotal:0,
+            yjIsajax:false,
+            peopleIsajax:false,
         }
     },
     watch: {
@@ -173,11 +226,19 @@ export default {
     props: {
         // 集成父级参数
     },
+    inject: ['reload'],
     beforeCreate() {
         // console.group('创建前状态  ===============》beforeCreate');
     },
     created() {
         // console.group('创建完毕状态===============》created');
+        //loading
+        const loading=this.$loading({
+            lock:true,
+            text:'稍等，稍等一下子',
+            spinner:'el-icon-loading',
+            background:'rgba(0,0,0,.7)'
+        })
         let id=this.$route.query.id
         this.$http({//基本信息
             method:'post',
@@ -188,6 +249,7 @@ export default {
             }
         }).then(res =>{
             this.basic = res.data.data
+            loading.close();
         })
         this.$http({//资质
             method:'post',
@@ -234,6 +296,9 @@ export default {
     },
     methods: {
         // 方法 集合
+        jump(){
+            window.open(this.basic.url, '_blank')
+        },
         mergeTd(tab,maxCol){//tab为table的DOM，maxcol为列数
             let  val, count, start;
             for(let col = maxCol-1; col >= 0 ; col--){
@@ -274,10 +339,12 @@ export default {
         tabFn(i){//tab切换
             this.tabNum=i;
             if(i==1){
+                this.peopleData.pageNo=1;
                 this.peopleData.province=this.basic.regisAddress;
                 this.peopleData.comId=this.$route.query.id;
                 this.peopleAjax();
             }else if(i==2){
+                this.yjData.pageNo=1;
                 this.yjData.comId=this.$route.query.id;
                 this.yjData.comName=this.basic.comName;
                 this.yjAjax();
@@ -285,6 +352,8 @@ export default {
         },
         peopleAjax(){
             this.peopleList=[];
+            this.peopleIsajax=false;
+            let that=this;
             this.$http({
                 method:'post',
                 url:'company/person',
@@ -292,6 +361,10 @@ export default {
             }).then(res =>{
                 this.peopleList=res.data.data
                 this.peopleTotal = res.data.total
+                this.peopleIsajax=true
+            }).catch(req =>{
+                that.peopleList=null
+                that.peopleIsajax=true
             })
         },
         peopleGoto(val){
@@ -300,6 +373,8 @@ export default {
         },
         yjAjax(){
             this.yjList=[];
+            this.yjIsajax=false;
+            let that=this;
             this.$http({
                 method:'post',
                 url:'project/company/list',
@@ -307,12 +382,20 @@ export default {
             }).then(res =>{
                 this.yjList=res.data.data
                 this.yjTotal = res.data.total
+                this.yjIsajax=true
+            }).catch(req =>{
+                that.yjList=null
+                that.yjIsajax=true
             })
         },
         yjGoto(val){
             this.yjData.pageNo = val.cur
             this.yjAjax()
-        }   
+        },
+        //刷新
+        recoldFn() {
+            this.reload();
+        },   
     }
 
 }

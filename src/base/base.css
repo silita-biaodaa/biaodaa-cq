@@ -35,3 +35,8 @@ body .el-loading-spinner .el-loading-text{
 body .el-loading-spinner .path{
     stroke:#FE6603
 }
+body .el-icon-loading{
+    /* color: #999; */
+    margin-bottom: 20px;
+    font-size: 50px;
+}
