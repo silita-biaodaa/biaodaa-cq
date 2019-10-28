@@ -1,32 +1,34 @@
 <!-- 模型： DOM 结构 -->
 <template>
     <div class="ZHquery">
-        <h1>综合查询内测版</h1>
+        <h1 class="web-font">四库一专查</h1>
         <!-- 筛选 -->
         <div class="select maxW-box">
-            <el-row>
-                <el-col :span="2">企业地区：</el-col>
-                <el-col :span="22"  class="condition">
-                    <div v-for="(el,i) in addressList" :key='i' :class="el.code==data.regisAddress?'current':''" @click='addressFn(el)'>{{el.name}}</div>
-                </el-col>
-            </el-row>
-            <el-row v-if="data.regisAddress=='重庆市'">
-                <el-col :span="2">备案地区：</el-col>
-                <el-col :span="22" class="condition">
-                    <div v-for="(el,i) in recordList" :key='i' :class="el.code==data.joinRegion?'current':''" @click='isBeiFn(el)'>{{el.name}}</div>
-                </el-col>
-            </el-row>
+            <div class="bottom-bor">
+                <el-row>
+                    <el-col :span="2">企业地区：</el-col>
+                    <el-col :span="22"  class="condition">
+                        <div v-for="(el,i) in addressList" :key='i' :class="el.code==data.regisAddress?'current':''" @click='addressFn(el)'>{{el.name}}</div>
+                    </el-col>
+                </el-row>
+                <el-row v-if="data.regisAddress!=''">
+                    <el-col :span="2">备案地区：</el-col>
+                    <el-col :span="22" class="condition">
+                        <div v-for="(el,i) in recordList" :key='i' :class="el.code==data.joinRegion?'current':''" @click='isBeiFn(el)'>{{el.name}}</div>
+                    </el-col>
+                </el-row>
+            </div>
             <!-- 资质 -->
-			<v-screenzz :qualList='companyQuals' @contentChange='screenzzFn' :zztype='data.qualCode' ></v-screenzz>
+			<v-screenzz  class="bottom-bor" :qualList='companyQuals' @contentChange='screenzzFn' :zztype='data.qualCode' ></v-screenzz>
             <!-- 人员 -->
-            <v-screenry :qualList='peopleList' @contentChange='screenryFn'></v-screenry>
+            <v-screenry  class="bottom-bor" :qualList='peopleList' @contentChange='screenryFn'></v-screenry>
             <!-- 业绩要求 -->
-            <el-row class="yj">
+            <el-row class="yj bottom-bor" >
                 <el-col :span="2">业绩要求：</el-col>
                 <el-col :span="22">
                     <!-- 项目关键字 -->
                     <el-row>
-                        <el-col :span="3">项目关键字：</el-col>
+                        <el-col :span="1">项目关键字：</el-col>
                         <el-input placeholder="请输入内容,多个关键字用空格隔开"  v-model="data.project.keywords"></el-input>
                         <el-radio-group v-model="data.project.opt">
                             <el-radio label="title">根据标题搜索</el-radio>
@@ -36,63 +38,63 @@
                     </el-row>
                     <!-- 业绩所含子项 -->
                     <el-row>
-                        <el-col :span="3">业绩所含子项:</el-col>
+                        <el-col :span="1">业绩所含子项:</el-col>
                         <div class="condition">
                             <div class='item' v-for="(el,i) in itemList" :key='i' :class="el.istap?'current':''" @click="itemFn(el)">{{el.name}}</div>
                         </div>
                     </el-row>
                     <!-- 项目属地 -->
                     <el-row>
-                        <el-col :span="3">项目属地：</el-col>
+                        <el-col :span="1">项目属地：</el-col>
                         <div class="condition">
                             <div class="areas" v-for="(el,i) of areasList" :key="'a'+i" :class="el.istap?'current':''" @click="areaTap(el)">{{el.name}}</div>
                         </div>
                     </el-row>
                     <!-- 工程用途 -->
                     <el-row>
-                        <el-col :span="3">工程用途：</el-col>
+                        <el-col :span="1">工程用途：</el-col>
                         <div class="condition">
                             <div class="areas" v-for="(el,i) of purposeList" :key="'a'+i" :class="el.istap?'current':''" @click="purposeTap(el)">{{el.name}}</div>
                         </div>
                     </el-row>
                     <!-- 业绩类型 -->
                     <el-row>
-                        <el-col :span="3">业绩类型：</el-col>
+                        <el-col :span="1">业绩类型：</el-col>
                         <div class="condition">
                             <div class="areas" v-for="(el,i) of typeList" :key="'a'+i" :class="el.istap?'current':''" @click="typeTap(el)">{{el.name}}</div>
                         </div>
                     </el-row>
                     <!-- 中标金额/合同金额 -->
                     <el-row>
-                        <el-col :span="5">中标金额/合同金额：</el-col>
+                        <el-col :span="1">中标金额/合同金额：</el-col>
                         <el-input placeholder="最低价（万元）" v-model="data.project.amountStart" class="inputW" @keyup.native="data.project.amountStart=data.project.amountStart.replace(/\D/g,'')"></el-input>
                         ——
                         <el-input placeholder="最高价（万元）" v-model="data.project.amountEnd" class="inputW r" @keyup.native="data.project.amountEnd=data.project.amountEnd.replace(/\D/g,'')"></el-input>
                     </el-row>
                     <!-- 中标日期/合同签订日期 -->
                     <el-row>
-                        <el-col :span="5">中标日期/合同签订日期：</el-col>
+                        <el-col :span="1">中标日期/合同签订日期：</el-col>
                         <el-date-picker value-format="yyyy-MM-dd" v-model="data.project.contractStart" type="date" placeholder="起始日期" class="inputW"></el-date-picker>
                         ——
                         <el-date-picker value-format="yyyy-MM-dd" v-model="data.project.contractEnd" type="date" placeholder="结束日期" class="inputW r"></el-date-picker>
                     </el-row>
                     <!-- 竣工验收日期 -->
                     <el-row>
-                        <el-col :span="5">竣工验收日期：</el-col>
+                        <el-col :span="1">竣工验收日期：</el-col>
                         <el-date-picker value-format="yyyy-MM-dd" v-model="data.project.completeStart" type="date" placeholder="起始日期" class="inputW"></el-date-picker>
                         ——
                         <el-date-picker value-format="yyyy-MM-dd" v-model="data.project.completeEnd" type="date" placeholder="结束日期" class="inputW r"></el-date-picker>
                     </el-row>
                     <!-- 面积 -->
                     <el-row>
-                        <el-col :span="5">面积（平方米）：</el-col>
+                        <el-col :span="1">面积（平方米）：</el-col>
                         <el-input placeholder="最小面积（㎡）" v-model="data.project.areaStart" class="inputW" @keyup.native="data.project.areaStart=data.project.areaStart.replace(/\D/g,'')"></el-input>
                         ——
                         <el-input placeholder="最大面积（㎡）" v-model="data.project.areaEnd" class="inputW r" @keyup.native="data.project.areaEnd=data.project.areaEnd.replace(/\D/g,'')"></el-input>
                     </el-row>
                     <!-- 符合业绩条件的数量 -->
                     <el-row v-if="isyj">
-                        <el-col :span="5">符合业绩条件的数量：</el-col>
+                        <el-col :span="1">符合业绩条件的数量：</el-col>
                         <el-input-number v-model="data.project.proCount" :min="1" size="mini"></el-input-number>
                     </el-row>
                 </el-col>
@@ -135,7 +137,7 @@
                             </div>
                             <div class="bottom">
                                 <p>注册地：<font>{{o.regisAddress}}</font></p>
-                                <p v-if="data.qualCode!=null">符合要求资质：<font>{{o.qualCount}}</font></p>
+                                <p v-if="data.qualCode!=null&&data.qualCode!=''">符合要求资质：<font>{{o.qualCount}}</font></p>
                                 <!-- <font>符合要求人员：<font>1</font></p> -->
                                 <p v-if="isyj">符合要求业绩：<font>{{o.projectCount}}</font></p>
                             </div>
@@ -324,15 +326,7 @@ export default {
                     istap:false,
                 }
             ],
-            addressList:[
-                {
-                    name:'全国',
-                    code:''
-                },{
-                    name:'重庆市',
-                    code:'重庆市'
-                }
-            ],
+            addressList:[],
             companyQuals:[],
             areasList:[],
             peopleList:[],
@@ -417,6 +411,14 @@ export default {
                 data.comQua.splice(x,1);
             }
         }
+        for(let x of data.area){
+            x.code=x.name
+        }
+        this.addressList=JSON.parse(JSON.stringify(data.area));
+        this.addressList.unshift({
+            name:'全国',
+            code:''
+        })
         this.companyQuals = data.comQua;
         for(let x of data.area){
             x.istap=false
@@ -426,6 +428,7 @@ export default {
             name:'不限',
             istap:true,
         })
+
         let ryData=JSON.parse(sessionStorage.getItem('people'));
         this.peopleList=ryData
         // this.data=this.$store.state.queryData;
@@ -452,7 +455,14 @@ export default {
     methods: {
         // 方法 集合
         addressFn(el){
-            this.data.regisAddress=el.code;
+            if(el.name=='全国'){
+                this.data.regisAddress=''
+            }else{
+                this.data.regisAddress=el.name;
+                this.recordList[0].name=el.shortName+'内企业';
+                this.recordList[1].name='入'+el.shortName+'企业';
+                this.recordList[2].name='入'+el.shortName+'+'+el.shortName+'内企业';
+            }
             this.data.pageNo=1;
             // this.ajax()
         },
@@ -578,6 +588,7 @@ export default {
         //跳转
         jumpDetail(id){
             let d=this.data;
+            let that=this;
             if(d.project.keywords!=''||d.project.opt!='title'||d.project.childProject
                 ||d.project.proWhere||d.project.proUse||d.project.proType||d.project.amountStart
                 ||d.project.amountEnd||d.project.contractStart||d.project.contractEnd||d.project.completeStart
@@ -595,6 +606,8 @@ export default {
                         }
                     })
                     window.open(href, '_blank', )
+                }).catch(function(error){
+                    that.$alert(error);
                 })
             }else{
                 const {href} = this.$router.resolve({
@@ -627,12 +640,21 @@ export default {
         align-items: center;
     }
 }
-.select{
+.bottom-bor{
+    // border-bottom: 10px solid #f0f0f0
+    margin-bottom: 10px;
+    background: #fff;
     padding: 15px 10px 10px;
-    background-color: #fff;
+    .el-col-1{
+        width: auto;
+    }
+}
+
+.select{
+    // background-color: #fff;
     font-size: 16px;
     box-sizing: border-box;
-    margin: 20px auto;
+    margin: 0 auto;
     .yj{
         .el-input{
             width:250px;

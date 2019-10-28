@@ -4,7 +4,7 @@ import Vue from 'vue'
 Vue.prototype.$http = axios
 axios.defaults.retry = 4;//重复请求次数
 axios.defaults.retryDelay = 1000;//重复请求间隔
-axios.defaults.timeout =  6000;//6秒超时
+axios.defaults.timeout =  60000;//6秒超时
 axios.defaults.baseURL = process.env.API_HOST;
 
 axios.interceptors.response.use(undefined, function axiosRetryInterceptor(err) {

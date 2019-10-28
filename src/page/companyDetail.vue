@@ -89,8 +89,8 @@
                                         <td>{{o.name}}</td>
                                         <td>{{o.idCard}}</td>
                                         <td>{{o.certNo}}</td>
-                                        <td>{{o.major}}</td>
                                         <td>{{o.category}}</td>
+                                        <td>{{o.major}}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -456,11 +456,16 @@ export default {
                 text-align: center;
                 min-width:25%;
                 width: 100%;
+                padding: 0 30px;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
             }
             .bg{
                 background: rgb(242, 242, 242);
                 font-weight: bold;
                 width: 25%;
+                justify-content: center;
             }
         }
     }

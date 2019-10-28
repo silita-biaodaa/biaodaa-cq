@@ -253,6 +253,7 @@ export default {
                     }
                 }
             }
+            this.returnStr();
         },
         twoChangeFn(o,i,el=null){
             o.three.cateName='';
@@ -377,7 +378,7 @@ export default {
         padding: 0 10px;
     }
     .search-b{
-        margin-bottom: 10px;
+        // margin-bottom: 10px;
         position: relative;
         .search-list{
             position: absolute;

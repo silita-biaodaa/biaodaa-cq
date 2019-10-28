@@ -500,14 +500,18 @@ export default {
             border-bottom: 1px solid rgb(228, 228, 228);
             p{
                 line-height: 40px;
-                text-align: center;
                 min-width:25%;
                 width: 100%;
+                padding: 0 30px;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
             }
             .bg{
                 background: rgb(242, 242, 242);
                 font-weight: bold;
                 width: 25%;
+                justify-content: center;
             }
         }
     }
