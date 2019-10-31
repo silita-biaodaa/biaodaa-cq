@@ -688,7 +688,7 @@ export default {
     background-color: #fff;
     box-sizing: border-box;
     li{
-        height: 80px;
+        min-height: 80px;
         border-bottom: 1px solid #f0f0f0;
         padding: 15px;
     }
@@ -703,11 +703,15 @@ export default {
             font-size: 20px;
             margin-right: 12px;
         }
+        .right-label{
+            max-width: 755px;
+        }
         .label{
             display: inline-block;
             padding: 2px 5px;
             text-align: center;
-            margin-right: 12px;
+            margin-right: 10px;
+            margin-bottom: 8px;
             background: #E3E6FD;
             color: #3A76F0;
         }
